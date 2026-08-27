@@ -1,0 +1,213 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #1b5e20;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #1b5e20;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color: #222;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app {
+  width: min(100% - 24px, 370px);
+  margin: 0 auto;
+  padding: 16px 0 28px;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: 26px;
+  text-align: center;
+}
+
+.card {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 20px 16px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 15%);
+}
+
+.card h2 {
+  margin: 0 0 18px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.player-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 118px;
+  gap: 10px;
+  align-items: center;
+}
+
+.name-input,
+.score-input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  background: white;
+  font-size: 15px;
+}
+
+.score-area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.score-input {
+  text-align: right;
+}
+
+.score-area span {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.score-hint {
+  margin: 12px 0 0;
+  color: #777;
+  font-size: 13px;
+  text-align: right;
+}
+
+.total-score {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.valid {
+  color: #078314;
+}
+
+.invalid {
+  color: #c62828;
+}
+
+button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px;
+  border: 0;
+  border-radius: 10px;
+  background: #2e7d32;
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px;
+  background: #f4f4f4;
+  border-radius: 10px;
+}
+
+.result-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.result-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-values {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.plus {
+  color: #087b16;
+  font-weight: 700;
+}
+
+.minus {
+  color: #d11f1f;
+  font-weight: 700;
+}
+
+@media (max-width: 380px) {
+  .app {
+    width: min(100% - 14px, 350px);
+  }
+
+  .card {
+    padding: 18px 12px;
+  }
+
+  .player-row {
+    grid-template-columns: minmax(0, 1fr) 110px;
+    gap: 8px;
+  }
+
+  .name-input,
+  .score-input {
+    padding: 9px 8px;
+  }
+
+  h1 {
+    font-size: 23px;
+  }
+}
+
+.save-button {
+  background: #1565c0;
+}
+
+.game-count {
+  margin: 16px 0 0;
+  text-align: right;
+  color: #666;
+  font-size: 14px;
+}
