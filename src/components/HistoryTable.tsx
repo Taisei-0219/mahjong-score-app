@@ -9,6 +9,7 @@ type Props = {
     yen: number;
   }[];
   onDeleteGame: (gameId: number) => void;
+  onResetGames: () => void;
 };
 
 export default function HistoryTable({
@@ -16,6 +17,7 @@ export default function HistoryTable({
   games,
   totals,
   onDeleteGame,
+  onResetGames,
 }: Props) {
   return (
     <section className="card">
@@ -90,6 +92,9 @@ export default function HistoryTable({
           </tbody>
         </table>
       </div>
+      <button className="reset-button" type="button" onClick={onResetGames}>
+        今日の記録をリセット
+      </button>
     </section>
   );
 }

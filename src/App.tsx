@@ -176,52 +176,12 @@ function App() {
       <ResultCard results={results} onSaveGame={saveGame} />
 
       {games.length > 0 && (
-        <section className="card">
-          <h2>今日の累計</h2>
-
-          <div className="result-list">
-            {[...totals]
-              .sort((a, b) => b.point - a.point)
-              .map((player, index) => (
-                <div className="result-row" key={player.id}>
-                  <div className="result-name">
-                    <strong>{index + 1}位</strong>
-                    <span>{player.name}</span>
-                  </div>
-
-                  <div className="result-values">
-                    <span className={player.point >= 0 ? "plus" : "minus"}>
-                      {player.point >= 0 ? "+" : ""}
-                      {player.point.toFixed(1)}
-                    </span>
-
-                    <span>
-                      {player.yen >= 0 ? "+" : ""}
-                      {player.yen.toLocaleString()}円
-                    </span>
-                  </div>
-                </div>
-              ))}
-          </div>
-
-          <p className="game-count">半荘数：{games.length}</p>
-
-          <button
-            className="reset-button"
-            type="button"
-            onClick={resetAllGames}
-          >
-            今日の記録をリセット
-          </button>
-        </section>
-      )}
-
-      {games.length > 0 && (
         <HistoryTable
           players={players}
           games={games}
           totals={totals}
           onDeleteGame={deleteGame}
+          onResetGames={resetAllGames}
         />
       )}
     </main>
