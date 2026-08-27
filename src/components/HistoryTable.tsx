@@ -62,7 +62,7 @@ export default function HistoryTable({
                     type="button"
                     onClick={() => onDeleteGame(game.id)}
                   >
-                    🗑
+                    ×
                   </button>
                 </td>
               </tr>

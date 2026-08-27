@@ -299,36 +299,109 @@ input::placeholder {
 /* ========================= */
 
 .history-table-wrapper {
+  width: 100%;
   overflow-x: auto;
 }
 
 .history-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   text-align: center;
+  font-size: 14px;
 }
 
 .history-table th,
 .history-table td {
-  padding: 10px 6px;
+  padding: 12px 4px;
   border-bottom: 1px solid #ddd;
+  vertical-align: middle;
 }
 
 .history-table th {
-  font-weight: 700;
   background: #f3f3f3;
+  color: #222;
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-all;
+}
+
+.history-table th:first-child,
+.history-table td:first-child {
+  width: 42px;
+}
+
+.history-table th:last-child,
+.history-table td:last-child {
+  width: 44px;
 }
 
 .history-total {
-  font-weight: bold;
+  font-weight: 700;
   background: #f8f8f8;
 }
 
 .delete-small {
-  width: auto;
+  width: 32px;
+  height: 32px;
   margin: 0;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
   background: #d32f2f;
-  font-size: 13px;
+  color: white;
+  font-size: 15px;
+  line-height: 32px;
+}
+
+/* ========================= */
+/* ダークモード */
+/* ========================= */
+
+@media (prefers-color-scheme: dark) {
+  .history-table {
+    color: #f5f5f5;
+  }
+
+  .history-table th {
+    background: #2b2b2b;
+    color: #f5f5f5;
+    border-bottom: 1px solid #444;
+  }
+
+  .history-table td {
+    background: #1f1f1f;
+    color: #f5f5f5;
+    border-bottom: 1px solid #333;
+  }
+
+  .history-table td.plus {
+    color: #6ee787;
+  }
+
+  .history-table td.minus {
+    color: #ff7b72;
+  }
+
+  .history-total td {
+    background: #292929;
+    font-weight: 700;
+  }
+
+  .history-total td.plus {
+    color: #6ee787;
+  }
+
+  .history-total td.minus {
+    color: #ff7b72;
+  }
+
+  .delete-small {
+    background: #c62828;
+    color: white;
+  }
+}
+
+.history-table th:not(:first-child):not(:last-child) {
+  font-size: 12px;
 }
