@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { calculateResult } from "./utils/calculateResult";
 import type { Player, ResultPlayer, SavedGame } from "./types";
+import ScoreInput from "./components/ScoreInput";
 
 const START_SCORE = 25000;
 const YEN_PER_POINT = 50;
@@ -164,57 +165,12 @@ function App() {
     <main className="app">
       <h1>🀄 麻雀スコア管理</h1>
 
-      <section className="card">
-        <h2>半荘結果</h2>
-
-        <div className="player-list">
-          {players.map((player) => (
-            <div className="player-row" key={player.id}>
-              <input
-                className="name-input"
-                type="text"
-                value={player.name}
-                onChange={(event) =>
-                  updatePlayer(player.id, "name", event.target.value)
-                }
-              />
-
-              <div className="score-area">
-                <input
-                  className="score-input"
-                  type="number"
-                  inputMode="numeric"
-                  value={player.scoreInput}
-                  step={1}
-                  onChange={(event) =>
-                    updatePlayer(player.id, "scoreInput", event.target.value)
-                  }
-                />
-
-                <span>00点</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <p className="score-hint">例：423 → 42,300点</p>
-
-        <div
-          className={
-            totalScore === 100000 ? "total-score valid" : "total-score invalid"
-          }
-        >
-          合計：{totalScore.toLocaleString()}点
-        </div>
-
-        <button
-          type="button"
-          onClick={calculateResults}
-          disabled={totalScore !== 100000}
-        >
-          計算する
-        </button>
-      </section>
+      <ScoreInput
+        players={players}
+        totalScore={totalScore}
+        onUpdatePlayer={updatePlayer}
+        onCalculate={calculateResults}
+      />
 
       {results.length > 0 && (
         <section className="card">
