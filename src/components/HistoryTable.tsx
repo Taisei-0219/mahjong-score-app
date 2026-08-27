@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { toPng } from "html-to-image";
+import { toBlob } from "html-to-image";
 import type { Player, SavedGame } from "../types";
 
 type Total = {
@@ -26,15 +26,43 @@ export default function HistoryTable({
 }: Props) {
   const tableRef = useRef<HTMLDivElement>(null);
 
-  const handleDownload = async () => {
-    if (!tableRef.current) return;
+  const handleShare = async () => {
+    if (!tableRef.current) {
+      return;
+    }
 
-    const dataUrl = await toPng(tableRef.current);
+    const blob = await toBlob(tableRef.current);
+
+    if (!blob) {
+      return;
+    }
+
+    const file = new File([blob], "mahjong-result.png", {
+      type: "image/png",
+    });
+
+    if (
+      navigator.share &&
+      navigator.canShare?.({
+        files: [file],
+      })
+    ) {
+      await navigator.share({
+        title: "麻雀結果",
+        files: [file],
+      });
+
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");
+    link.href = url;
     link.download = "mahjong-result.png";
-    link.href = dataUrl;
     link.click();
+
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -113,7 +141,7 @@ export default function HistoryTable({
         </table>
       </div>
 
-      <button className="share-button" type="button" onClick={handleDownload}>
+      <button className="share-button" type="button" onClick={handleShare}>
         📤 結果を画像で保存
       </button>
 
