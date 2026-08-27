@@ -211,3 +211,7 @@ button:disabled {
   color: #666;
   font-size: 14px;
 }
+
+.reset-button {
+  background: #b71c1c;
+}

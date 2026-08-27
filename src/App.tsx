@@ -1,55 +1,65 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-
-type Player = {
-  id: number;
-  name: string;
-  scoreInput: number;
-};
-
-type ResultPlayer = {
-  id: number;
-  name: string;
-  score: number;
-  point: number;
-  yen: number;
-};
-
-type SavedGame = {
-  id: number;
-  createdAt: string;
-  results: ResultPlayer[];
-};
+import { calculateResult } from "./utils/calculateResult";
+import type { Player, ResultPlayer, SavedGame } from "./types";
 
 const START_SCORE = 25000;
-const RETURN_SCORE = 30000;
-const UMA_OKA = [50, 10, -10, -30];
 const YEN_PER_POINT = 50;
 
 const STORAGE_KEY = "mahjong-score-games";
+const PLAYER_STORAGE_KEY = "mahjong-score-player-names";
 
 function App() {
-  const [players, setPlayers] = useState<Player[]>([
-    { id: 1, name: "プレイヤー1", scoreInput: START_SCORE / 100 },
-    { id: 2, name: "プレイヤー2", scoreInput: START_SCORE / 100 },
-    { id: 3, name: "プレイヤー3", scoreInput: START_SCORE / 100 },
-    { id: 4, name: "プレイヤー4", scoreInput: START_SCORE / 100 },
-  ]);
+  const [players, setPlayers] = useState<Player[]>(() => {
+    const savedNames = localStorage.getItem(PLAYER_STORAGE_KEY);
+
+    const defaultPlayers: Player[] = [
+      { id: 1, name: "プレイヤー1", scoreInput: START_SCORE / 100 },
+      { id: 2, name: "プレイヤー2", scoreInput: START_SCORE / 100 },
+      { id: 3, name: "プレイヤー3", scoreInput: START_SCORE / 100 },
+      { id: 4, name: "プレイヤー4", scoreInput: START_SCORE / 100 },
+    ];
+
+    if (!savedNames) {
+      return defaultPlayers;
+    }
+
+    try {
+      const names: string[] = JSON.parse(savedNames);
+
+      return defaultPlayers.map((player, index) => ({
+        ...player,
+        name: names[index] ?? player.name,
+      }));
+    } catch {
+      return defaultPlayers;
+    }
+  });
 
   const [results, setResults] = useState<ResultPlayer[]>([]);
-  const [games, setGames] = useState<SavedGame[]>([]);
-
-  useEffect(() => {
+  const [games, setGames] = useState<SavedGame[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
 
-    if (saved) {
-      setGames(JSON.parse(saved));
+    if (!saved) {
+      return [];
     }
-  }, []);
+
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
   }, [games]);
+
+  useEffect(() => {
+    const names = players.map((player) => player.name);
+
+    localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(names));
+  }, [players]);
 
   const updatePlayer = (
     id: number,
@@ -66,6 +76,8 @@ function App() {
           : player,
       ),
     );
+
+    setResults([]);
   };
 
   const scores = players.map((player) => ({
@@ -76,60 +88,17 @@ function App() {
   const totalScore = scores.reduce((sum, player) => sum + player.score, 0);
 
   const calculateResults = () => {
-    const sorted = [...scores].sort((a, b) => b.score - a.score);
-
-    const calculatedResults: ResultPlayer[] = [];
-
-    let index = 0;
-
-    while (index < sorted.length) {
-      const currentScore = sorted[index].score;
-
-      const sameScorePlayers = sorted.filter(
-        (player) => player.score === currentScore,
-      );
-
-      const alreadyProcessed = calculatedResults.some(
-        (result) => result.score === currentScore,
-      );
-
-      if (alreadyProcessed) {
-        index += 1;
-        continue;
-      }
-
-      const startRankIndex = index;
-      const endRankIndex = index + sameScorePlayers.length - 1;
-
-      const rankBonus =
-        UMA_OKA.slice(startRankIndex, endRankIndex + 1).reduce(
-          (sum, value) => sum + value,
-          0,
-        ) / sameScorePlayers.length;
-
-      sameScorePlayers.forEach((player) => {
-        const basePoint = (player.score - RETURN_SCORE) / 1000;
-        const point = basePoint + rankBonus;
-
-        calculatedResults.push({
-          id: player.id,
-          name: player.name,
-          score: player.score,
-          point,
-          yen: Math.round(point * YEN_PER_POINT),
-        });
-      });
-
-      index += sameScorePlayers.length;
+    if (totalScore !== 100000) {
+      return;
     }
 
-    calculatedResults.sort((a, b) => b.score - a.score);
-
-    setResults(calculatedResults);
+    setResults(calculateResult(players));
   };
 
   const saveGame = () => {
-    if (results.length === 0) return;
+    if (results.length === 0) {
+      return;
+    }
 
     const newGame: SavedGame = {
       id: Date.now(),
@@ -150,28 +119,44 @@ function App() {
   };
 
   const deleteGame = (gameId: number) => {
+    const shouldDelete = window.confirm("この半荘の記録を削除しますか？");
+
+    if (!shouldDelete) {
+      return;
+    }
+
     setGames((currentGames) =>
       currentGames.filter((game) => game.id !== gameId),
     );
   };
 
-  const totals = players.map((player) => {
-    const playerName = player.name;
+  const resetAllGames = () => {
+    const shouldReset = window.confirm(
+      "今日の半荘履歴と累計をすべて削除しますか？",
+    );
 
+    if (!shouldReset) {
+      return;
+    }
+
+    setGames([]);
+    setResults([]);
+  };
+
+  const totals = players.map((player) => {
     const point = games.reduce((sum, game) => {
       const result = game.results.find(
-        (gamePlayer) => gamePlayer.name === playerName,
+        (gamePlayer) => gamePlayer.id === player.id,
       );
 
       return sum + (result?.point ?? 0);
     }, 0);
 
-    const yen = Math.round(point * YEN_PER_POINT);
-
     return {
-      name: playerName,
+      id: player.id,
+      name: player.name,
       point,
-      yen,
+      yen: Math.round(point * YEN_PER_POINT),
     };
   });
 
@@ -272,7 +257,7 @@ function App() {
             {[...totals]
               .sort((a, b) => b.point - a.point)
               .map((player, index) => (
-                <div className="result-row" key={player.name}>
+                <div className="result-row" key={player.id}>
                   <div className="result-name">
                     <strong>{index + 1}位</strong>
                     <span>{player.name}</span>
@@ -294,6 +279,14 @@ function App() {
           </div>
 
           <p className="game-count">半荘数：{games.length}</p>
+
+          <button
+            className="reset-button"
+            type="button"
+            onClick={resetAllGames}
+          >
+            今日の記録をリセット
+          </button>
         </section>
       )}
 
@@ -305,7 +298,10 @@ function App() {
             {[...games].reverse().map((game, gameIndex) => (
               <div className="history-card" key={game.id}>
                 <div className="history-header">
-                  <strong>第{games.length - gameIndex}半荘</strong>
+                  <strong>
+                    第{games.length - gameIndex}
+                    半荘
+                  </strong>
 
                   <button
                     className="delete-button"
