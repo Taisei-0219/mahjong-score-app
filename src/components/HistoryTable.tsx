@@ -1,15 +1,18 @@
 import type { Player, SavedGame } from "../types";
 
+type Total = {
+  id: number;
+  name: string;
+  point: number;
+  yen: number;
+};
+
 type Props = {
   players: Player[];
   games: SavedGame[];
-  totals: {
-    name: string;
-    point: number;
-    yen: number;
-  }[];
+  totals: Total[];
   onDeleteGame: (gameId: number) => void;
-  onResetGames: () => void;
+  onFinishSession: () => void;
 };
 
 export default function HistoryTable({
@@ -17,7 +20,7 @@ export default function HistoryTable({
   games,
   totals,
   onDeleteGame,
-  onResetGames,
+  onFinishSession,
 }: Props) {
   return (
     <section className="card">
@@ -27,7 +30,7 @@ export default function HistoryTable({
         <table className="history-table">
           <thead>
             <tr>
-              <th>半荘</th>
+              <th></th>
 
               {players.map((player) => (
                 <th key={player.id}>{player.name}</th>
@@ -38,22 +41,24 @@ export default function HistoryTable({
           </thead>
 
           <tbody>
-            {[...games].map((game, index) => (
+            {games.map((game, index) => (
               <tr key={game.id}>
-                <td>{index + 1}</td>
+                <td className="game-number">{index + 1}</td>
 
                 {players.map((player) => {
                   const result = game.results.find(
-                    (r) => r.name === player.name,
+                    (gameResult) => gameResult.id === player.id,
                   );
+
+                  const point = result?.point ?? 0;
 
                   return (
                     <td
                       key={player.id}
-                      className={(result?.point ?? 0) >= 0 ? "plus" : "minus"}
+                      className={point >= 0 ? "plus" : "minus"}
                     >
-                      {(result?.point ?? 0) >= 0 ? "+" : ""}
-                      {(result?.point ?? 0).toFixed(1)}
+                      {point >= 0 ? "+" : ""}
+                      {point.toFixed(1)}
                     </td>
                   );
                 })}
@@ -62,6 +67,7 @@ export default function HistoryTable({
                   <button
                     className="delete-small"
                     type="button"
+                    aria-label={`${index + 1}半荘目を削除`}
                     onClick={() => onDeleteGame(game.id)}
                   >
                     ×
@@ -74,15 +80,14 @@ export default function HistoryTable({
               <td>合計</td>
 
               {players.map((player) => {
-                const total = totals.find((t) => t.name === player.name);
+                const total = totals.find((item) => item.id === player.id);
+
+                const point = total?.point ?? 0;
 
                 return (
-                  <td
-                    key={player.id}
-                    className={(total?.point ?? 0) >= 0 ? "plus" : "minus"}
-                  >
-                    {(total?.point ?? 0) >= 0 ? "+" : ""}
-                    {(total?.point ?? 0).toFixed(1)}
+                  <td key={player.id} className={point >= 0 ? "plus" : "minus"}>
+                    {point >= 0 ? "+" : ""}
+                    {point.toFixed(1)}
                   </td>
                 );
               })}
@@ -92,8 +97,13 @@ export default function HistoryTable({
           </tbody>
         </table>
       </div>
-      <button className="reset-button" type="button" onClick={onResetGames}>
-        今日の記録をリセット
+
+      <button
+        className="finish-session-button"
+        type="button"
+        onClick={onFinishSession}
+      >
+        今日の対局を終了・保存
       </button>
     </section>
   );

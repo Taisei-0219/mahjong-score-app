@@ -17,3 +17,15 @@ export type SavedGame = {
   createdAt: string;
   results: ResultPlayer[];
 };
+
+export type SessionPlayer = {
+  id: number;
+  name: string;
+};
+
+export type SavedSession = {
+  id: number;
+  date: string;
+  players: SessionPlayer[];
+  games: SavedGame[];
+};

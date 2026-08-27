@@ -1,26 +1,31 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+
 import { calculateResult } from "./utils/calculateResult";
-import type { Player, ResultPlayer, SavedGame } from "./types";
+
+import type { Player, ResultPlayer, SavedGame, SavedSession } from "./types";
+
 import ScoreInput from "./components/ScoreInput";
 import ResultCard from "./components/ResultCard";
 import HistoryTable from "./components/HistoryTable";
+import SessionList from "./components/SessionList";
 
 const YEN_PER_POINT = 50;
 
-const STORAGE_KEY = "mahjong-score-games";
+const GAME_STORAGE_KEY = "mahjong-score-games";
 const PLAYER_STORAGE_KEY = "mahjong-score-player-names";
+const SESSION_STORAGE_KEY = "mahjong-score-sessions";
 
 function App() {
   const [players, setPlayers] = useState<Player[]>(() => {
-    const savedNames = localStorage.getItem(PLAYER_STORAGE_KEY);
-
     const defaultPlayers: Player[] = [
       { id: 1, name: "プレイヤー1", scoreInput: "" },
       { id: 2, name: "プレイヤー2", scoreInput: "" },
       { id: 3, name: "プレイヤー3", scoreInput: "" },
       { id: 4, name: "プレイヤー4", scoreInput: "" },
     ];
+
+    const savedNames = localStorage.getItem(PLAYER_STORAGE_KEY);
 
     if (!savedNames) {
       return defaultPlayers;
@@ -39,8 +44,23 @@ function App() {
   });
 
   const [results, setResults] = useState<ResultPlayer[]>([]);
+
   const [games, setGames] = useState<SavedGame[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(GAME_STORAGE_KEY);
+
+    if (!saved) {
+      return [];
+    }
+
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return [];
+    }
+  });
+
+  const [sessions, setSessions] = useState<SavedSession[]>(() => {
+    const saved = localStorage.getItem(SESSION_STORAGE_KEY);
 
     if (!saved) {
       return [];
@@ -54,7 +74,7 @@ function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+    localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(games));
   }, [games]);
 
   useEffect(() => {
@@ -62,6 +82,10 @@ function App() {
 
     localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(names));
   }, [players]);
+
+  useEffect(() => {
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessions));
+  }, [sessions]);
 
   const updatePlayer = (
     id: number,
@@ -132,17 +156,52 @@ function App() {
     );
   };
 
-  const resetAllGames = () => {
-    const shouldReset = window.confirm(
-      "今日の半荘履歴と累計をすべて削除しますか？",
-    );
-
-    if (!shouldReset) {
+  const finishSession = () => {
+    if (games.length === 0) {
       return;
     }
 
+    const shouldSave = window.confirm(
+      "今日の結果を保存して、現在の対局を終了しますか？",
+    );
+
+    if (!shouldSave) {
+      return;
+    }
+
+    const newSession: SavedSession = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      players: players.map((player) => ({
+        id: player.id,
+        name: player.name,
+      })),
+      games,
+    };
+
+    setSessions((currentSessions) => [...currentSessions, newSession]);
+
     setGames([]);
     setResults([]);
+
+    setPlayers((currentPlayers) =>
+      currentPlayers.map((player) => ({
+        ...player,
+        scoreInput: "",
+      })),
+    );
+  };
+
+  const deleteSession = (sessionId: number) => {
+    const shouldDelete = window.confirm("この日の保存記録を削除しますか？");
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    setSessions((currentSessions) =>
+      currentSessions.filter((session) => session.id !== sessionId),
+    );
   };
 
   const totals = players.map((player) => {
@@ -181,9 +240,11 @@ function App() {
           games={games}
           totals={totals}
           onDeleteGame={deleteGame}
-          onResetGames={resetAllGames}
+          onFinishSession={finishSession}
         />
       )}
+
+      <SessionList sessions={sessions} onDeleteSession={deleteSession} />
     </main>
   );
 }
