@@ -7,7 +7,7 @@ const YEN_PER_POINT = 50;
 export function calculateResult(players: Player[]): ResultPlayer[] {
   const scores = players.map((player) => ({
     ...player,
-    score: player.scoreInput * 100,
+    score: Number(player.scoreInput || "0") * 100,
   }));
 
   const sorted = [...scores].sort((a, b) => b.score - a.score);

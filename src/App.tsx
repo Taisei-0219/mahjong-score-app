@@ -5,7 +5,6 @@ import type { Player, ResultPlayer, SavedGame } from "./types";
 import ScoreInput from "./components/ScoreInput";
 import ResultCard from "./components/ResultCard";
 
-const START_SCORE = 25000;
 const YEN_PER_POINT = 50;
 
 const STORAGE_KEY = "mahjong-score-games";
@@ -16,10 +15,10 @@ function App() {
     const savedNames = localStorage.getItem(PLAYER_STORAGE_KEY);
 
     const defaultPlayers: Player[] = [
-      { id: 1, name: "プレイヤー1", scoreInput: START_SCORE / 100 },
-      { id: 2, name: "プレイヤー2", scoreInput: START_SCORE / 100 },
-      { id: 3, name: "プレイヤー3", scoreInput: START_SCORE / 100 },
-      { id: 4, name: "プレイヤー4", scoreInput: START_SCORE / 100 },
+      { id: 1, name: "プレイヤー1", scoreInput: "" },
+      { id: 2, name: "プレイヤー2", scoreInput: "" },
+      { id: 3, name: "プレイヤー3", scoreInput: "" },
+      { id: 4, name: "プレイヤー4", scoreInput: "" },
     ];
 
     if (!savedNames) {
@@ -73,7 +72,7 @@ function App() {
         player.id === id
           ? {
               ...player,
-              [field]: field === "scoreInput" ? Number(value) : value,
+              [field]: value,
             }
           : player,
       ),
@@ -84,7 +83,7 @@ function App() {
 
   const scores = players.map((player) => ({
     ...player,
-    score: player.scoreInput * 100,
+    score: Number(player.scoreInput || "0") * 100,
   }));
 
   const totalScore = scores.reduce((sum, player) => sum + player.score, 0);
@@ -115,7 +114,7 @@ function App() {
     setPlayers((currentPlayers) =>
       currentPlayers.map((player) => ({
         ...player,
-        scoreInput: START_SCORE / 100,
+        scoreInput: "",
       })),
     );
   };

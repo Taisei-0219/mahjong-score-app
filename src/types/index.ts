@@ -1,7 +1,7 @@
 export type Player = {
   id: number;
   name: string;
-  scoreInput: number;
+  scoreInput: string;
 };
 
 export type ResultPlayer = {
