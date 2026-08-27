@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { toPng } from "html-to-image";
 import type { Player, SavedGame } from "../types";
 
 type Total = {
@@ -22,11 +24,24 @@ export default function HistoryTable({
   onDeleteGame,
   onFinishSession,
 }: Props) {
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async () => {
+    if (!tableRef.current) return;
+
+    const dataUrl = await toPng(tableRef.current);
+
+    const link = document.createElement("a");
+    link.download = "mahjong-result.png";
+    link.href = dataUrl;
+    link.click();
+  };
+
   return (
     <section className="card">
       <h2>半荘履歴</h2>
 
-      <div className="history-table-wrapper">
+      <div className="history-table-wrapper" ref={tableRef}>
         <table className="history-table">
           <thead>
             <tr>
@@ -97,6 +112,10 @@ export default function HistoryTable({
           </tbody>
         </table>
       </div>
+
+      <button className="share-button" type="button" onClick={handleDownload}>
+        📤 結果を画像で保存
+      </button>
 
       <button
         className="finish-session-button"
