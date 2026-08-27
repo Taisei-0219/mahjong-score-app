@@ -293,3 +293,42 @@ input::placeholder {
     background: #555;
   }
 }
+
+/* ========================= */
+/* 履歴テーブル */
+/* ========================= */
+
+.history-table-wrapper {
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.history-table th,
+.history-table td {
+  padding: 10px 6px;
+  border-bottom: 1px solid #ddd;
+}
+
+.history-table th {
+  font-weight: 700;
+  background: #f3f3f3;
+}
+
+.history-total {
+  font-weight: bold;
+  background: #f8f8f8;
+}
+
+.delete-small {
+  width: auto;
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #d32f2f;
+  font-size: 13px;
+}

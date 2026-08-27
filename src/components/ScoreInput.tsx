@@ -40,6 +40,7 @@ export default function ScoreInput({
                 inputMode="numeric"
                 value={player.scoreInput}
                 step={1}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) =>
                   onUpdatePlayer(player.id, "scoreInput", e.target.value)
                 }

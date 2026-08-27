@@ -4,6 +4,7 @@ import { calculateResult } from "./utils/calculateResult";
 import type { Player, ResultPlayer, SavedGame } from "./types";
 import ScoreInput from "./components/ScoreInput";
 import ResultCard from "./components/ResultCard";
+import HistoryTable from "./components/HistoryTable";
 
 const YEN_PER_POINT = 50;
 
@@ -216,45 +217,12 @@ function App() {
       )}
 
       {games.length > 0 && (
-        <section className="card">
-          <h2>半荘履歴</h2>
-
-          <div className="history-list">
-            {[...games].reverse().map((game, gameIndex) => (
-              <div className="history-card" key={game.id}>
-                <div className="history-header">
-                  <strong>
-                    第{games.length - gameIndex}
-                    半荘
-                  </strong>
-
-                  <button
-                    className="delete-button"
-                    type="button"
-                    onClick={() => deleteGame(game.id)}
-                  >
-                    削除
-                  </button>
-                </div>
-
-                <div className="history-results">
-                  {game.results.map((player, index) => (
-                    <div className="history-row" key={player.id}>
-                      <span>
-                        {index + 1}位 {player.name}
-                      </span>
-
-                      <span className={player.point >= 0 ? "plus" : "minus"}>
-                        {player.point >= 0 ? "+" : ""}
-                        {player.point.toFixed(1)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <HistoryTable
+          players={players}
+          games={games}
+          totals={totals}
+          onDeleteGame={deleteGame}
+        />
       )}
     </main>
   );
